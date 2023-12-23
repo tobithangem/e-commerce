@@ -10,10 +10,13 @@ public class User {
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "ID")
     private Long id;
+
     @Column(name = "USERNAME")
     private String userName;
+
     @Column(name = "PASSWORD_HASH")
     private String passwordHash;
+
     @Column(name = "PHONE_NUMBER")
     private String phoneNumber;
 }
