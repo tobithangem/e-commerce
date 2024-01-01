@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -22,7 +23,7 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     CategoryRepo categoryRepo;
 
-    public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/uploads";
+    public static String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/uploads";
 
     @Override
     public void save(ProductSdi request) throws Exception {
@@ -31,8 +32,9 @@ public class ProductServiceImpl implements ProductService {
         if (category == null) throw new NotFoundException("Luu san pham that bai. Khong tim thay categoty co Id tuong ung: " + request.getCategoryId());
 
         //save image
+        String newFileName = uniqueString();
         StringBuilder imageFileName = new StringBuilder();
-        Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, request.getImage().getOriginalFilename());
+        Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, newFileName);
         imageFileName.append(request.getImage().getOriginalFilename());
         try {
             Files.write(fileNameAndPath, request.getImage().getBytes());
@@ -48,10 +50,18 @@ public class ProductServiceImpl implements ProductService {
                 .price(request.getPrice())
                 .quantity(request.getQuantity())
                 .description(request.getDescription())
-                .imageUrl(fileNameAndPath.toString())
+                .imageUrl("uploads/" + newFileName)
                 .status(1)
                 .build();
 
         productRepo.save(product);
+    }
+
+    private static String uniqueString() {
+        String random = UUID.randomUUID().toString();
+        random = random.replaceAll("-", "");
+        random = random.substring(0, 16);
+
+        return random;
     }
 }
